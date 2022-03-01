@@ -23,32 +23,28 @@ async function run() {
         // Get All Data
         app.get('/users', async (req, res) => {
             const cursor = usersCollection.find({});
-            const count = await cursor.count()
-            const page = req.query.page;
-            const size = parseInt(req.query.size);
-            console.log(page, size);
-            let users;
-            if (page) {
-                users = await cursor.skip(page * size).limit(size).toArray();
-            }
-            else {
-                users = await cursor.toArray();
-            }
-            res.send({
-                count,
-                users
-            })
+            const result = await cursor.toArray();
+            res.json(result)
         })
 
-        // Find a Document
-        app.get('/users/:id', async (req, res) => {
-            const id = req.params.id;
-            const query = { _id: ObjectId(id) }
+        // Find a User By MongoDB ID
+        // app.get('/users/:id', async (req, res) => {
+        //     const id = req.params.id;
+        //     const query = { _id: ObjectId(id) }
+        //     const result = await usersCollection.findOne(query)
+        //     res.json(result)
+        // })
+
+        // Find a User By User ID
+        app.get('/users/:user_id', async (req, res) => {
+            const id = req.params.user_id;
+            console.log(id);
+            const query = { user_id: id }
             const result = await usersCollection.findOne(query)
             res.json(result)
         })
 
-        // POST API || Create a Document to Insert
+        // POST API || Create a User to Insert
         app.post('/users', async (req, res) => {
             const newUser = req.body;
             const result = await usersCollection.insertOne(newUser)
@@ -67,7 +63,7 @@ async function run() {
         app.put('/users/:id', async (req, res) => {
             const id = req.params.id;
             const updateInfo = req.body;
-            const filter = { _id: ObjectId(id) }
+            const filter = { user_id: id }
             const options = { upsert: true };
             const updateDoc = {
                 $set: {
